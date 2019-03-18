@@ -1,112 +1,143 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
 
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
-  	<meta property="og:title" content=" My New Hugo Site" />
-  	<meta property="og:site_name" content="My New Hugo Site" />
-  	<meta property="og:url" content="https://bzeron.github.io/" />
-    
-    
-    <meta property="og:type" content="website" />
-    
-
-  <title>
-     My New Hugo Site
-  </title>
-
-    <meta name="description" content="" />
-
-    <meta name="HandheldFriendly" content="True" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <link rel="shortcut icon" href="https://bzeron.github.io/images/favicon.ico">
-	  <link rel="apple-touch-icon" href="https://bzeron.github.io/images/apple-touch-icon.png" />
-    
-    <link rel="stylesheet" type="text/css" href="https://bzeron.github.io/css/screen.css" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400|Inconsolata" />
-
-
-    
-      
-      
-        <link href="https://bzeron.github.io/index.xml" rel="alternate" type="application/rss+xml" title="My New Hugo Site" />
-      
-    
-    <meta name="generator" content="Hugo 0.49.2" />
-
-    <link rel="canonical" href="https://bzeron.github.io/" />
-
-    
-<div id="particles-js"></div>
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="https://bzeron.github.io/js/particles.js"></script>   
+    <meta charset="utf-8">
+    <title>JS</title>
+    <style type="text/css">
+        body,
+        html {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
 </head>
-<body class="nav-closed">
 
-  
-
-
- <div class="site-wrapper">
-
-
-
-<header class="main-header no-cover">
-
-    
-
-    <nav class="main-nav overlay clearfix">
-        
-        
-    </nav>
-<div class="vertical">
-        <div class="main-header-content inner">
-            <h1 class="page-title">
-              <a class="btn-bootstrap-2 title-scroll" href="#content">My New Hugo Site</a>
-          </h1>
-          <h2 class="page-description"></h2>
+<body>
+    <div id="draw">
+        <div id="draw-box">
+            <canvas id="draw-box-canvas" class="draw-box-canvas"
+                style="background-color: rgba(138,43,226,0.27)"></canvas>
         </div>
-</div>
-    <a class="scroll-down icon-arrow-left" href="#content"><span class="hidden">Scroll Down</span></a>
-</header>
-
-<main id="content" class="content" role="main">
-
-    
-
-    <div class="extra-pagination inner">
-        <nav class="pagination" role="navigation">
-	
-	<span class="page-number">Page 1 of 0</span>
-	
-</nav>
-
+        <div id="draw-color" class="draw-color">
+            <span id="draw-color-white" class="draw-color-white"></span>
+            <span id="draw-color-red" class="draw-color-red"></span>
+            <span id="draw-color-blue" class="draw-color-blue"></span>
+            <span id="draw-color-green" class="draw-color-green"></span>
+            <span id="draw-color-yellow" class="draw-color-yellow"></span>
+            <span id="draw-color-orange" class="draw-color-orange"></span>
+            <span id="draw-color-black" class="draw-color-black active"></span>
+        </div>
+        <div id="draw-clear" class="draw-clear">
+            <button id="draw-clear-button" class="draw-clear-button" onclick="clearDraw()">Clear!!</button>
+        </div>
+        <div id="image"></div>
     </div>
 
-    
+    <script type="text/javascript">
+        var draw = new Draw('draw-box-canvas', 500, 500, { color: 'red', width: 5 });
 
-    <nav class="pagination" role="navigation">
-	
-	<span class="page-number">Page 1 of 0</span>
-	
-</nav>
+        window.onload = function () {
+            draw.setting(function (context) {
+                context.lineCap = "round";
+                context.lineJoin = "round";
+                context.strokeStyle = "black";
+                context.lineWidth = 5;
+            });
+        };
 
+        function Draw(id, width, height, border = {}) {
+            this.id = id;
+            this.width = width;
+            this.height = height;
+            this.border = border;
+            // get element by id
+            this.canvas = document.getElementById(this.id);
+            // set width
+            this.canvas.width = this.width;
+            // set height
+            this.canvas.height = this.height;
+            // get 2d context
+            this.context = this.canvas.getContext("2d");
+            // is border setting?
+            this.drawBorder = function (border) {
+                if (border) {
+                    this.context.strokeStyle = border.color;
+                    this.context.lineWidth = border.width;
+                    this.context.strokeRect(0, 0, this.width, this.height);
+                }
+            }.bind(this);
+            // draw border
+            this.drawBorder(this.border);
+            // settings
+            this.setting = function (callback) {
+                callback(this.context);
+            }.bind(this);
 
-</main>
+            this.drawed = false;
+            this.draw = null;
 
-    <footer class="site-footer clearfix">
-        <section class="copyright"><a href="">My New Hugo Site</a> </section>
-        
-        <section class="poweredby">Proudly generated by <a class="icon-hugo" href="https://gohugo.io">HUGO</a>, with <a class="icon-theme" href="https://github.com/syui/hugo-theme-air">hugo-theme-air</a> theme</section>
-        
-    </footer>
-    </div>
-    <script type="text/javascript" src="https://bzeron.github.io/js/jquery.js"></script>
-    <script type="text/javascript" src="https://bzeron.github.io/js/jquery.fitvids.js"></script>
-    <script type="text/javascript" src="https://bzeron.github.io/js/index.js"></script>
+            this.canvas.onmousedown = function (e) {
+                this.drawed = true;
+                this.draw = this.position(e.clientX, e.clientY);
+                this.drawing(e);
+            }.bind(this);
 
+            this.canvas.onmousemove = function (e) {
+                this.drawing(e);
+            }.bind(this);
+
+            this.canvas.onmouseup = function (e) {
+                this.drawed = false;
+            }.bind(this);
+
+            this.canvas.onmouseout = function (e) {
+                this.drawed = false;
+            }.bind(this);
+
+            this.position = function (x, y) {
+                var box = this.canvas.getBoundingClientRect();
+                return { x: x - box.left, y: y - box.top };
+            }.bind(this);
+
+            this.drawing = function (e) {
+                if (this.drawed) {
+                    var position = this.position(e.clientX, e.clientY);
+                    this.context.save();
+                    this.context.beginPath();
+                    this.context.moveTo(this.draw.x, this.draw.y);
+                    this.context.lineTo(position.x, position.y);
+                    this.context.stroke();
+                    this.draw = position;
+                    this.context.restore();
+                }
+            }.bind(this);
+
+            this.clear = function () {
+                this.context.clearRect(0, 0, this.width, this.height);
+                this.drawBorder(this.border);
+            }.bind(this);
+
+            this.image = function () {
+                var small = document.createElement('canvas').getContext('2d');
+                var img = new Image();
+                small.drawImage(img, 0, 0, img.width, img.height, 0, 0, 28, 28);
+                var data = this.context.getImageData(0, 0, 28, 28).data;
+                console.log(data, data.length);
+                return this.canvas.toDataURL('png');
+            }.bind(this);
+        }
+
+        function clearDraw() {
+            // draw.clear();
+            var image = new Image();
+            image.crossorigin = "Anonymous";
+            image.onload = function () {
+            };
+            image.src = draw.image();
+            document.getElementById('image').appendChild(image);
+        }
+    </script>
 </body>
-</html>
 
+</html>
